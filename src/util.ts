@@ -24,8 +24,12 @@ export function getFrameSource(frame: stackTrace.StackFrame, maps: Map<string, s
   const lineNumber = frame.getLineNumber()
   let contents = maps.get(filename)
   if (!contents) {
-    contents = fs.readFileSync(filename, 'utf8')
-    maps.set(filename, contents)
+    if (fs.existsSync(filename)) {
+      contents = fs.readFileSync(filename, 'utf8')
+      maps.set(filename, contents)
+    } else {
+      contents = ''
+    }
   }
   const lines = contents.split(/\r?\n/)
 

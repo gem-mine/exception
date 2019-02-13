@@ -39,13 +39,62 @@ export interface OPTIONS {
   defaultMessage?: string
 }
 
+let _init = true
+
+function parseError(ctx: Koa.Context, e: any, options?: OPTIONS): Exception {
+  const code = e.httpCode || e.statusCode || 500
+  const message = e.message || 'unknown exception'
+
+  let data: Exception = {
+    code,
+    message
+  }
+
+  if (options) {
+    const { debug } = options
+    if (debug) {
+      console.error(e)
+      const { req } = ctx
+      const { headers } = req
+      const cookies = parseCookie(headers.cookie)
+
+      data = {
+        code,
+        httpVersion: req.httpVersion,
+        method: req.method,
+        url: req.url,
+        message,
+        connection: headers.connection,
+        headers,
+        cookies,
+        stack: parseException(e)
+      }
+    }
+  }
+
+  return data
+}
+
 function exception(options?: OPTIONS): (context: Koa.Context, next: () => Promise<any>) => void {
   return async function(ctx: Koa.Context, next: () => Promise<any>) {
     try {
+      if (_init) {
+        _init = false
+
+        ctx.app.on('error', e => {
+          if (options) {
+            const { logger } = options
+            if (logger) {
+              const data = parseError(ctx, e, options)
+              logger(data, ctx)
+            }
+          }
+        })
+      }
       await next()
     } catch (e) {
-      const code = e.httpCode || e.statusCode || 500
-      const message = e.message || 'unknown exception'
+      const data = parseError(ctx, e, options)
+      const code = data.code
 
       if (code > 600) {
         ctx.status = 500
@@ -56,33 +105,8 @@ function exception(options?: OPTIONS): (context: Koa.Context, next: () => Promis
       if (type !== 'text/plain' && type !== 'text/html') {
         ctx.type = 'application/json'
       }
-
-      let data: Exception = {
-        code,
-        message
-      }
-
       if (options) {
-        const { debug, custom, logger } = options
-        if (debug) {
-          console.error(e)
-          const { req } = ctx
-          const { headers } = req
-          const cookies = parseCookie(headers.cookie)
-
-          data = {
-            code,
-            httpVersion: req.httpVersion,
-            method: req.method,
-            url: req.url,
-            message,
-            connection: headers.connection,
-            headers,
-            cookies,
-            stack: parseException(e)
-          }
-        }
-
+        const { custom, logger } = options
         if (custom) {
           await custom(data, ctx)
         } else {
