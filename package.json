@@ -1,0 +1,38 @@
+{
+  "name": "@gem-mine/exception",
+  "version": "0.1.0",
+  "description": "catch exception for koa",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "exception",
+    "error",
+    "koa",
+    "typescript"
+  ],
+  "author": "caolvchong@gmail.com",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/cookie": "^0.3.2",
+    "@types/koa": "^2.0.48",
+    "@types/node": "^10.12.19",
+    "@types/stack-trace": "0.0.29",
+    "koa": "^2.7.0",
+    "ts-node": "^8.0.2",
+    "tslib": "^1.9.3",
+    "tslint": "^5.12.1",
+    "tslint-eslint-rules": "^5.4.0",
+    "typescript": "^3.2.4"
+  },
+  "dependencies": {
+    "cookie": "^0.3.1",
+    "stack-trace": "0.0.10"
+  }
+}
