@@ -1,6 +1,6 @@
 {
   "name": "@gem-mine/exception",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "catch exception for koa",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",

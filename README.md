@@ -17,11 +17,15 @@ app.use(exception({
    */
   debug?: boolean
   /**
+   * 404页面，当非 json 请求遇到 404 时的返回页面
+   */
+  notFoundPage?: string
+  /**
    * 写入日志处理
    */
   logger?: function(data:Exception):void
   /**
-   * 自定义处理
+   * 自定义异常处理
    */
   custom?: function(data:Exception):void
 }))
@@ -38,8 +42,15 @@ export default exception({
 ```js
 export default exception({
   debug: process.env.NODE_ENV !== 'production',
-  custom: function(data, ctx) {
-    if (ctx.status === 404) {
+  notFoundPage: '404.html
+})
+```
+
+```js
+export default exception({
+  debug: process.env.NODE_ENV !== 'production',
+  async custom(data, ctx) {
+    if (ctx.status === 404 && !ctx.acceptJSON) {
       return await ctx.render('404.html')
     }
     ctx.body = data
